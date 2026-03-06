@@ -10,7 +10,9 @@
   "license": "MIT",
   "homepage": "https://www.concordcrm.com/docs/api/1.x/introduction",
   "author": {
-    "name": "Xen AI LLC"
+    "name": "Digital Domination Services  LLC",
+    "email": "biswajit@digitaldomination.io",
+    "url": "https://www.digitaldomination.io"
   },
   "repository": {
     "type": "git",
