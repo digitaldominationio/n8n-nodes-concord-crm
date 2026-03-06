@@ -50,7 +50,7 @@ async function concordRequest(
 
   const url = `${baseUrl}/api${endpoint}${qs ? buildQueryString(qs) : ''}`;
 
-  const options = {
+  const response = await this.helpers.httpRequest({
     method: method as IHttpRequestMethods,
     url,
     headers: {
@@ -58,16 +58,11 @@ async function concordRequest(
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: body && Object.keys(body).length ? JSON.stringify(body) : undefined,
-    json: false,
-  };
+    body: body && Object.keys(body).length ? body : undefined,
+    json: true,
+  });
 
-  const response = await this.helpers.request(options);
-  try {
-    return typeof response === 'string' ? JSON.parse(response) : response;
-  } catch {
-    return { raw: response };
-  }
+  return response as IDataObject;
 }
 
 // ─────────────────────────────────────────────

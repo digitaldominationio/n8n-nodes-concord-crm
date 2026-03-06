@@ -31,7 +31,7 @@ async function concordRequest(method, endpoint, body, qs) {
     const baseUrl = stripTrailingSlash(credentials.baseUrl);
     const token = credentials.apiToken;
     const url = `${baseUrl}/api${endpoint}${qs ? buildQueryString(qs) : ''}`;
-    const options = {
+    const response = await this.helpers.httpRequest({
         method: method,
         url,
         headers: {
@@ -39,16 +39,10 @@ async function concordRequest(method, endpoint, body, qs) {
             'Content-Type': 'application/json',
             Accept: 'application/json',
         },
-        body: body && Object.keys(body).length ? JSON.stringify(body) : undefined,
-        json: false,
-    };
-    const response = await this.helpers.request(options);
-    try {
-        return typeof response === 'string' ? JSON.parse(response) : response;
-    }
-    catch {
-        return { raw: response };
-    }
+        body: body && Object.keys(body).length ? body : undefined,
+        json: true,
+    });
+    return response;
 }
 // ─────────────────────────────────────────────
 // Node definition
