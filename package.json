@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-concord-crm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "n8n community node for Concord CRM — full API coverage for Deals, Contacts, Companies, Activities, Notes, Calls, Documents, Products, Pipelines, and more.",
   "keywords": [
     "n8n-community-node-package",
