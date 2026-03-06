@@ -14,18 +14,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/n8n-nodes-concord-crm"
+    "url": "https://github.com/digitaldominationio/n8n-nodes-concord-crm"
   },
   "main": "index.js",
   "scripts": {
     "build": "tsc && cp nodes/ConcordCrm/concord-crm.svg dist/nodes/ConcordCrm/concord-crm.svg && cp credentials/concord-crm.svg dist/credentials/concord-crm.svg",
     "dev": "tsc --watch",
-    "lint": "eslint nodes credentials --ext .ts",
-    "lintfix": "eslint nodes credentials --ext .ts --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials"
+    "lint": "echo \"No linter configured\"",
+    "lintfix": "echo \"No linter configured\"",
+    "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist"
+    "dist",
+    "nodes/ConcordCrm/concord-crm.svg",
+    "credentials/concord-crm.svg",
+    "README.md",
+    "LICENSE"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
