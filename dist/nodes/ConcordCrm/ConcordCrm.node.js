@@ -784,7 +784,7 @@ class ConcordCrm {
             }
             catch (error) {
                 if (this.continueOnFail()) {
-                    returnData.push({ error: error.message });
+                    returnData.push({ json: { error: error.message }, pairedItem: { item: i } });
                     continue;
                 }
                 throw new n8n_workflow_1.NodeOperationError(this.getNode(), error, { itemIndex: i });
@@ -792,14 +792,14 @@ class ConcordCrm {
             // Normalise: if the response has a `data` array, flatten it
             if (Array.isArray(responseData === null || responseData === void 0 ? void 0 : responseData.data)) {
                 for (const item of responseData.data) {
-                    returnData.push(item);
+                    returnData.push({ json: item, pairedItem: { item: i } });
                 }
             }
             else {
-                returnData.push(responseData);
+                returnData.push({ json: responseData, pairedItem: { item: i } });
             }
         }
-        return [this.helpers.returnJsonArray(returnData)];
+        return [returnData];
     }
 }
 exports.ConcordCrm = ConcordCrm;

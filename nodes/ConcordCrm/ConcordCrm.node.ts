@@ -691,7 +691,7 @@ export class ConcordCrm implements INodeType {
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
     const items = this.getInputData();
-    const returnData: IDataObject[] = [];
+    const returnData: INodeExecutionData[] = [];
 
     for (let i = 0; i < items.length; i++) {
       const resource = this.getNodeParameter('resource', i) as string;
@@ -843,7 +843,7 @@ export class ConcordCrm implements INodeType {
         }
       } catch (error) {
         if (this.continueOnFail()) {
-          returnData.push({ error: (error as Error).message });
+          returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
           continue;
         }
         throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
@@ -852,13 +852,13 @@ export class ConcordCrm implements INodeType {
       // Normalise: if the response has a `data` array, flatten it
       if (Array.isArray((responseData as IDataObject)?.data)) {
         for (const item of (responseData as IDataObject).data as IDataObject[]) {
-          returnData.push(item);
+          returnData.push({ json: item, pairedItem: { item: i } });
         }
       } else {
-        returnData.push(responseData);
+        returnData.push({ json: responseData, pairedItem: { item: i } });
       }
     }
 
-    return [this.helpers.returnJsonArray(returnData)];
+    return [returnData as INodeExecutionData[]];
   }
 }
