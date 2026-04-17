@@ -1,0 +1,14 @@
+{
+	"node": "n8n-nodes-base.concordCrm",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Sales"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://www.concordcrm.com/docs/api/1.x/introduction"
+			}
+		]
+	},
+	"alias": ["CRM", "Concord", "Deals", "Contacts", "Companies"]
+}

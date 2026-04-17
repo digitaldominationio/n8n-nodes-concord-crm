@@ -3,9 +3,11 @@ import {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  NodeOperationError,
+  NodeApiError,
   IDataObject,
   IHttpRequestMethods,
+  NodeConnectionTypes,
+  JsonObject,
 } from 'n8n-workflow';
 
 // ─────────────────────────────────────────────
@@ -46,18 +48,12 @@ async function concordRequest(
 ): Promise<IDataObject> {
   const credentials = await this.getCredentials('concordCrmApi');
   const baseUrl = stripTrailingSlash(credentials.baseUrl as string);
-  const token = credentials.apiToken as string;
 
   const url = `${baseUrl}/api${endpoint}${qs ? buildQueryString(qs) : ''}`;
 
-  const response = await this.helpers.httpRequest({
+  const response = await this.helpers.httpRequestWithAuthentication.call(this, 'concordCrmApi', {
     method: method as IHttpRequestMethods,
     url,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
     body: body && Object.keys(body).length ? body : undefined,
     json: true,
   });
@@ -79,8 +75,8 @@ export class ConcordCrm implements INodeType {
     subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
     description: 'Interact with the Concord CRM API — Deals, Contacts, Companies, Activities, Notes, Calls, Documents, Products, Pipelines, Stages, Users and more.',
     defaults: { name: 'Concord CRM' },
-    inputs: ['main'],
-    outputs: ['main'],
+    inputs: [NodeConnectionTypes.Main],
+    outputs: [NodeConnectionTypes.Main],
     credentials: [
       {
         name: 'concordCrmApi',
@@ -710,7 +706,9 @@ export class ConcordCrm implements INodeType {
                 try {
                   const parsed = JSON.parse(val as string);
                   Object.assign(result, parsed);
-                } catch { /* ignore */ }
+                } catch (parseError) {
+                throw new NodeApiError(this.getNode(), { message: `Invalid JSON in custom_fields: ${(parseError as Error).message}` } as JsonObject, { itemIndex: i });
+              }
               } else {
                 result[key] = val;
               }
@@ -846,7 +844,7 @@ export class ConcordCrm implements INodeType {
           returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
           continue;
         }
-        throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
+        throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
       }
 
       // Normalise: if the response has a `data` array, flatten it

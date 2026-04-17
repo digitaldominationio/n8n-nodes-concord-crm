@@ -29,16 +29,10 @@ function buildQueryString(params) {
 async function concordRequest(method, endpoint, body, qs) {
     const credentials = await this.getCredentials('concordCrmApi');
     const baseUrl = stripTrailingSlash(credentials.baseUrl);
-    const token = credentials.apiToken;
     const url = `${baseUrl}/api${endpoint}${qs ? buildQueryString(qs) : ''}`;
-    const response = await this.helpers.httpRequest({
+    const response = await this.helpers.httpRequestWithAuthentication.call(this, 'concordCrmApi', {
         method: method,
         url,
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-        },
         body: body && Object.keys(body).length ? body : undefined,
         json: true,
     });
@@ -58,8 +52,8 @@ class ConcordCrm {
             subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
             description: 'Interact with the Concord CRM API — Deals, Contacts, Companies, Activities, Notes, Calls, Documents, Products, Pipelines, Stages, Users and more.',
             defaults: { name: 'Concord CRM' },
-            inputs: ['main'],
-            outputs: ['main'],
+            inputs: [n8n_workflow_1.NodeConnectionTypes.Main],
+            outputs: [n8n_workflow_1.NodeConnectionTypes.Main],
             credentials: [
                 {
                     name: 'concordCrmApi',
@@ -652,7 +646,9 @@ class ConcordCrm {
                                     const parsed = JSON.parse(val);
                                     Object.assign(result, parsed);
                                 }
-                                catch { /* ignore */ }
+                                catch (parseError) {
+                                    throw new n8n_workflow_1.NodeApiError(this.getNode(), { message: `Invalid JSON in custom_fields: ${parseError.message}` }, { itemIndex: i });
+                                }
                             }
                             else {
                                 result[key] = val;
@@ -787,7 +783,7 @@ class ConcordCrm {
                     returnData.push({ json: { error: error.message }, pairedItem: { item: i } });
                     continue;
                 }
-                throw new n8n_workflow_1.NodeOperationError(this.getNode(), error, { itemIndex: i });
+                throw new n8n_workflow_1.NodeApiError(this.getNode(), error, { itemIndex: i });
             }
             // Normalise: if the response has a `data` array, flatten it
             if (Array.isArray(responseData === null || responseData === void 0 ? void 0 : responseData.data)) {
